@@ -1,0 +1,53 @@
+#!/bin/bash
+set -e
+
+HUAYRA_SERVER_NAME=Toro
+ARCH_LIST="amd64"
+
+if [ -z "$CACHER" ]; then
+  MIRROR="http://ftp.debian.org/debian/"
+  MIRROR_SECURITY="http://security.debian.org/"
+else
+  MIRROR="http://$CACHER/ftp.debian.org/debian/"
+  MIRROR_SECURITY="http://$CACHER/security.debian.org/"
+fi
+
+
+if  [ "$ARCH" == "amd64" ]; then
+
+    lb config noauto \
+    --apt apt \
+    --apt-options '--force-yes -y' \
+    --apt-recommends false \
+    --apt-source-archives true \
+    --architectures amd64 \
+    --archive-areas 'main contrib non-free' \
+    --keyring-packages 'debian-archive-keyring' \
+    --binary-images iso-hybrid \
+    --debian-installer live \
+    --debian-installer-gui true \
+    --checksums md5 \
+    --debug \
+    --distribution jessie \
+    --iso-application "Huayra $HUAYRA_SERVER_NAME GNU/Linux" \
+    --iso-publisher 'Publicadores' \
+    --iso-volume "Huayra $HUAYRA_SERVER_NAME GNU/Linux" \
+    --initsystem systemd \
+    --linux-packages "linux-image linux-headers" \
+    --zsync false \
+    --loadlin false \
+    --win32-loader false \
+    --mirror-bootstrap $MIRROR \
+    --parent-mirror-chroot $MIRROR \
+    --parent-mirror-chroot-security $MIRROR_SECURITY \
+    --mirror-debian-installer $MIRROR \
+    --security true \
+    --updates true \
+    "${@}"
+else
+	echo
+	echo "ERROR: No se especifico arquitectura"
+	echo "Disponibles: $ARCH_LIST"
+	echo
+	exit -1
+fi
